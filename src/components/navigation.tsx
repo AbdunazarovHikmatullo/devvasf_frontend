@@ -1,11 +1,26 @@
+"use client"
+
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Bell, Plus } from "lucide-react"
+import { Plus, User, LogOut, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ModeToggle } from "./mode-toggle"
+import { useAuth } from "@/components/auth-provider"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import Link from "next/link"
+
 export default function Navigation() {
+  const { user, logout } = useAuth()
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b h-23.5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
@@ -25,16 +40,61 @@ export default function Navigation() {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Создать</span>
             </Button>
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
-            <ModeToggle/>
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
+                      <AvatarFallback>
+                        {user.first_name?.[0]}
+                        {user.last_name?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.first_name} {user.last_name}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/profile">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Профиль</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Настройки</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Выйти</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/account/login">Войти</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/account/register">Регистрация</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-      <div className="flex px-7 overflox-x-scroll">
-        
       </div>
     </header>
   )

@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import Navigation from "@/components/navigation"
+import { AuthProvider } from "@/components/auth-provider"
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,15 +32,17 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <Navigation />
-              <main className="flex-1 overflow-auto">
-                <div className="container mx-auto p-6">{children}</div>
-              </main>
-            </SidebarInset>
-          </SidebarProvider>
+          <AuthProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <Navigation />
+                <main className="flex-1 overflow-auto">
+                  <div className="container mx-auto p-6">{children}</div>
+                </main>
+              </SidebarInset>
+            </SidebarProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

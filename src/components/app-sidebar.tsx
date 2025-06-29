@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings, User } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, User, WorkflowIcon } from "lucide-react"
 import { Button } from "./ui/button"
 import { ModeToggle } from "./mode-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,17 +25,22 @@ const items = [
   },
   {
     title: "Уведомления",
-    url: "#",
+    url: "/notification",
     icon: Inbox,
   },
   {
     title: "Фрилансеры",
-    url: "freelancers",
+    url: "/freelancers",
     icon: Calendar,
   },
   {
+    title: "Вакансии",
+    url: "/vacancies",
+    icon: WorkflowIcon,
+  },
+  {
     title: "Поиск",
-    url: "#",
+    url: "#search",
     icon: Search,
   },
   {
@@ -43,6 +48,7 @@ const items = [
     url: "#",
     icon: Settings,
   },
+  
 ]
 
 export function AppSidebar() {
