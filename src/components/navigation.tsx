@@ -2,10 +2,11 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Plus, User, LogOut, Settings } from "lucide-react"
+import { Plus, Bell, User, LogOut, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ModeToggle } from "@/components/mode-toggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +16,43 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 export default function Navigation() {
-  const { user, logout } = useAuth()
+  const [mounted, setMounted] = useState(false)
+  const { user, logout, isLoading } = useAuth()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center gap-4 px-6">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="h-6" />
+          </div>
+
+          <div className="flex flex-1 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Devvasf
+              </h1>
+              <span className="text-sm text-muted-foreground hidden sm:inline">— платформа для разработчиков</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-16 bg-muted animate-pulse rounded"></div>
+              <div className="h-8 w-8 bg-muted animate-pulse rounded"></div>
+              <div className="h-8 w-8 bg-muted animate-pulse rounded"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -36,20 +71,33 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Создать</span>
-            </Button>
+            {user && (
+              <>
+                <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Создать</span>
+                </Button>
 
-            {user ? (
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="h-4 w-4" />
+                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                </Button>
+              </>
+            )}
+
+            <ModeToggle />
+
+            {isLoading ? (
+              <div className="h-8 w-8 bg-muted animate-pulse rounded-full"></div>
+            ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
+                      <AvatarImage src={user.avatar || "/placeholder.svg?height=32&width=32"} alt={user.username} />
                       <AvatarFallback>
-                        {user.first_name?.[0]}
-                        {user.last_name?.[0]}
+                        {user.first_name?.[0] || user.username?.[0] || "U"}
+                        {user.last_name?.[0] || ""}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -83,16 +131,7 @@ export default function Navigation() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/account/login">Войти</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/account/register">Регистрация</Link>
-                </Button>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

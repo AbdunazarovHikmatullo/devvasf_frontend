@@ -1,7 +1,12 @@
-import { Calendar, Home, Inbox, Search, Settings, User, WorkflowIcon } from "lucide-react"
+"use client"
+
+import { Home, Users, Briefcase, Search, Settings, User, Star, MapPin } from "lucide-react"
 import { Button } from "./ui/button"
-import { ModeToggle } from "./mode-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/components/auth-provider"
+import Link from "next/link"
+import { useEffect, useState } from "react"
 
 import {
   Sidebar,
@@ -24,38 +29,47 @@ const items = [
     icon: Home,
   },
   {
-    title: "Уведомления",
-    url: "/notification",
-    icon: Inbox,
-  },
-  {
     title: "Фрилансеры",
     url: "/freelancers",
-    icon: Calendar,
+    icon: Users,
   },
   {
     title: "Вакансии",
     url: "/vacancies",
-    icon: WorkflowIcon,
+    icon: Briefcase,
   },
   {
     title: "Поиск",
-    url: "#search",
+    url: "/search",
     icon: Search,
+  },
+]
+
+const accountItems = [
+  {
+    title: "Профиль",
+    url: "/account/profile",
+    icon: User,
   },
   {
     title: "Настройки",
-    url: "#",
+    url: "/account/settings",
     icon: Settings,
   },
-  
 ]
 
 export function AppSidebar() {
+  const [mounted, setMounted] = useState(false)
+  const { user, isLoading } = useAuth()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <Sidebar className="border-r">
-      <SidebarHeader className="border-b px-6 py-4 h-23.5">
-        <div className="flex items-center gap-3">
+      <SidebarHeader className="border-b px-6 py-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <span className="text-sm font-bold">D</span>
           </div>
@@ -64,6 +78,38 @@ export function AppSidebar() {
             <span className="text-xs text-muted-foreground">Платформа для разработчиков</span>
           </div>
         </div>
+
+        {mounted && !isLoading && user && (
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={user.avatar || "/placeholder.svg?height=40&width=40"} />
+              <AvatarFallback>
+                {user.first_name?.[0] || user.username?.[0] || "U"}
+                {user.last_name?.[0] || ""}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-sm font-medium truncate">
+                {user.first_name} {user.last_name}
+              </span>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                <span className="truncate">{user.city}</span>
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <Badge variant="secondary" className="text-xs px-1 py-0">
+                  {user.role}
+                </Badge>
+                {user.is_vip && (
+                  <Badge variant="default" className="text-xs px-1 py-0">
+                    <Star className="h-3 w-3 mr-1" />
+                    VIP
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </SidebarHeader>
 
       <SidebarContent className="px-4 py-4">
@@ -79,31 +125,54 @@ export function AppSidebar() {
                     asChild
                     className="w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
                   >
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {mounted && !isLoading && user && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Аккаунт
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="space-y-1">
+                {accountItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className="w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg?height=32&width=32" />
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-sm font-medium truncate">Пользователь</span>
-            <span className="text-xs text-muted-foreground truncate">user@example.com</span>
+        {mounted && !isLoading && !user && (
+          <div className="space-y-2">
+            <Button className="w-full" size="sm" asChild>
+              <Link href="/account/register">Регистрация</Link>
+            </Button>
+            <Button variant="outline" className="w-full bg-transparent" size="sm" asChild>
+              <Link href="/account/login">Войти</Link>
+            </Button>
           </div>
-        </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

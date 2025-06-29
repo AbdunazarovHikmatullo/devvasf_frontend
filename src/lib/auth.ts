@@ -82,8 +82,9 @@ export async function login_user(data: LoginUserData): Promise<AuthResponse> {
 
   const result = await response.json()
 
-  // Сохраняем токены в localStorage
-  if (result.access) {
+  // Сохраняем токены в localStorage только на клиенте
+  if (typeof window !== "undefined" && result.access) {
+    console.log("Saving tokens to localStorage")
     localStorage.setItem("access_token", result.access)
     localStorage.setItem("refresh_token", result.refresh)
     localStorage.setItem("user", JSON.stringify(result.user))
@@ -94,8 +95,13 @@ export async function login_user(data: LoginUserData): Promise<AuthResponse> {
 
 // Получение текущего пользователя
 export async function getCurrentUser(): Promise<User | null> {
+  if (typeof window === "undefined") return null
+
   const token = localStorage.getItem("access_token")
-  if (!token) return null
+  if (!token) {
+    console.log("No token found for getCurrentUser")
+    return null
+  }
 
   try {
     const response = await fetch(`${API_AUTH}me/`, {
@@ -105,11 +111,15 @@ export async function getCurrentUser(): Promise<User | null> {
     })
 
     if (!response.ok) {
+      console.log("Failed to get current user, status:", response.status)
       throw new Error("Failed to get user")
     }
 
-    return response.json()
+    const user = await response.json()
+    console.log("Got current user from server:", user)
+    return user
   } catch (error) {
+    console.error("getCurrentUser error:", error)
     // Если токен недействителен, очищаем localStorage
     logout()
     return null
@@ -118,23 +128,44 @@ export async function getCurrentUser(): Promise<User | null> {
 
 // Выход из системы
 export function logout() {
-  localStorage.removeItem("access_token")
-  localStorage.removeItem("refresh_token")
-  localStorage.removeItem("user")
+  if (typeof window !== "undefined") {
+    console.log("Clearing localStorage")
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("refresh_token")
+    localStorage.removeItem("user")
+  }
 }
 
 // Проверка авторизации
 export function isAuthenticated(): boolean {
-  return !!localStorage.getItem("access_token")
+  if (typeof window === "undefined") return false
+  const token = localStorage.getItem("access_token")
+  const hasToken = !!token
+  console.log("isAuthenticated check:", hasToken)
+  return hasToken
 }
 
 // Получение токена
 export function getToken(): string | null {
+  if (typeof window === "undefined") return null
   return localStorage.getItem("access_token")
 }
 
 // Получение пользователя из localStorage
 export function getStoredUser(): User | null {
-  const userStr = localStorage.getItem("user")
-  return userStr ? JSON.parse(userStr) : null
+  if (typeof window === "undefined") return null
+
+  try {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      console.log("Got stored user:", user)
+      return user
+    }
+  } catch (error) {
+    console.error("Error parsing stored user:", error)
+    localStorage.removeItem("user")
+  }
+
+  return null
 }
