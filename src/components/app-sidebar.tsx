@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Users, Briefcase, Search, Settings, User, Star, MapPin } from "lucide-react"
+import { Home, Users, Briefcase, Search, Settings, User, Star, MapPin, Newspaper } from "lucide-react"
 import { Button } from "./ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -39,6 +39,11 @@ const items = [
     icon: Briefcase,
   },
   {
+    title: "Новости",
+    url: "/news",
+    icon: Newspaper,
+  },
+  {
     title: "Поиск",
     url: "/search",
     icon: Search,
@@ -68,45 +73,56 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r">
-      <SidebarHeader className="border-b px-6 py-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-sm font-bold">D</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-semibold">Devvasf</span>
-            <span className="text-xs text-muted-foreground">Платформа для разработчиков</span>
-          </div>
-        </div>
-
-        {mounted && !isLoading && user && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={user.avatar || "/placeholder.svg?height=40&width=40"} />
-              <AvatarFallback>
+      <SidebarHeader className="border-b px-6 py-6">
+        {mounted && !isLoading && user ? (
+          // Авторизованный пользователь - показываем его аватар и информацию
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={user.avatar || "/placeholder.svg?height=48&width=48"} />
+              <AvatarFallback className="text-lg">
                 {user.first_name?.[0] || user.username?.[0] || "U"}
                 {user.last_name?.[0] || ""}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-sm font-medium truncate">
+              <span className="text-base font-semibold truncate">
                 {user.first_name} {user.last_name}
               </span>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                 <MapPin className="h-3 w-3" />
                 <span className="truncate">{user.city}</span>
               </div>
-              <div className="flex items-center gap-1 mt-1">
-                <Badge variant="secondary" className="text-xs px-1 py-0">
+              <div className="flex items-center gap-1">
+                <Badge variant="secondary" className="text-xs px-2 py-0">
                   {user.role}
                 </Badge>
                 {user.is_vip && (
-                  <Badge variant="default" className="text-xs px-1 py-0">
+                  <Badge variant="default" className="text-xs px-2 py-0">
                     <Star className="h-3 w-3 mr-1" />
                     VIP
                   </Badge>
                 )}
               </div>
+            </div>
+          </div>
+        ) : mounted && !isLoading ? (
+          // Неавторизованный пользователь - показываем логотип
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <span className="text-lg font-bold">D</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold">Devvasf</span>
+              <span className="text-xs text-muted-foreground">Платформа для разработчиков</span>
+            </div>
+          </div>
+        ) : (
+          // Загрузка
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 bg-muted animate-pulse rounded-full"></div>
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="h-4 bg-muted animate-pulse rounded"></div>
+              <div className="h-3 bg-muted animate-pulse rounded w-3/4"></div>
             </div>
           </div>
         )}

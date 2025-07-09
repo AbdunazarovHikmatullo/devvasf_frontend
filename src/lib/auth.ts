@@ -93,6 +93,61 @@ export async function login_user(data: LoginUserData): Promise<AuthResponse> {
   return result
 }
 
+// Получение списка всех пользователей - ИСПРАВЛЕНО
+export async function getAllUsers(): Promise<User[]> {
+  try {
+    const response = await fetch(`${API_AUTH}users/`, {
+      // Изменен endpoint
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch users")
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error("Error fetching users:", error)
+    return []
+  }
+}
+
+// Получение пользователей с фильтрацией
+export async function getUsersWithFilters(filters?: {
+  role?: string
+  city?: string
+  search?: string
+}): Promise<User[]> {
+  try {
+    const params = new URLSearchParams()
+
+    if (filters?.role) params.append("role", filters.role)
+    if (filters?.city) params.append("city", filters.city)
+    if (filters?.search) params.append("search", filters.search)
+
+    const url = `${API_AUTH}users/${params.toString() ? "?" + params.toString() : ""}`
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch users")
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error("Error fetching users with filters:", error)
+    return []
+  }
+}
+
 // Получение текущего пользователя
 export async function getCurrentUser(): Promise<User | null> {
   if (typeof window === "undefined") return null
@@ -168,4 +223,25 @@ export function getStoredUser(): User | null {
   }
 
   return null
+}
+
+
+export async function getUserByUsername(username: string): Promise<User | null> {
+  try {
+    const response = await fetch(`${API_AUTH}users/${username}/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("User not found")
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error(`Error fetching user ${username}:`, error)
+    return null
+  }
 }

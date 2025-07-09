@@ -1,0 +1,60 @@
+src/
+├── app
+│   ├── account
+│   │   ├── login
+│   │   │   └── page.tsx
+│   │   ├── profile
+│   │   │   └── page.tsx
+│   │   ├── register
+│   │   │   └── page.tsx
+│   │   ├── settings
+│   │   │   └── page.tsx
+│   │   └── [username]
+│   ├── favicon.ico
+│   ├── freelancers
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── news
+│   │   └── page.tsx
+│   ├── notification
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── settings
+│   │   └── page.tsx
+│   └── vacancies
+│       └── page.tsx
+├── components
+│   ├── app-sidebar.tsx
+│   ├── auth-provider.tsx
+│   ├── login-form.tsx
+│   ├── mode-toggle.tsx
+│   ├── navigation.tsx
+│   ├── register-form.tsx
+│   ├── theme-provider.tsx
+│   └── ui
+│       ├── avatar.tsx
+│       ├── badge.tsx
+│       ├── breadcrumb.tsx
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── checkbox.tsx
+│       ├── dropdown-menu.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       ├── navigation-menu.tsx
+│       ├── select.tsx
+│       ├── separator.tsx
+│       ├── sheet.tsx
+│       ├── sidebar.tsx
+│       ├── skeleton.tsx
+│       ├── textarea.tsx
+│       └── tooltip.tsx
+├── hooks
+│   ├── use-mobile.ts
+│   └── use-toast.ts
+└── lib
+    ├── auth.ts
+    └── utils.ts
+
+17 directories, 41 files
