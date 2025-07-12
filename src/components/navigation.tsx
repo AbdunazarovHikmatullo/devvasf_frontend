@@ -73,15 +73,7 @@ export default function Navigation() {
           <div className="flex items-center gap-2">
             {user && (
               <>
-                <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Создать</span>
-                </Button>
-
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-4 w-4" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                </Button>
+                
               </>
             )}
 

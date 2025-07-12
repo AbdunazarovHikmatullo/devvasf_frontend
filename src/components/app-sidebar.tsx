@@ -28,11 +28,7 @@ const items = [
     url: "/",
     icon: Home,
   },
-  {
-    title: "Фрилансеры",
-    url: "/freelancers",
-    icon: Users,
-  },
+
   {
     title: "Вакансии",
     url: "/vacancies",

@@ -1,4 +1,4 @@
-const URL_API = "http://127.0.0.1:8000/api/account/"
+const URL_API = "http://217.198.6.219:8000/api/account/"
 const API_AUTH = URL_API
 
 export interface RegisterUserData {
@@ -225,13 +225,15 @@ export function getStoredUser(): User | null {
   return null
 }
 
-
 export async function getUserByUsername(username: string): Promise<User | null> {
   try {
+    const token = localStorage.getItem("access_token")
+
     const response = await fetch(`${API_AUTH}users/${username}/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // Добавляем токен если есть
       },
     })
 
